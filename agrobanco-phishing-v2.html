@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AgroBanco (simulación educativa)</title>
+<style>
+:root{--grad1:#0a1628;--grad2:#1c3352;--accent:#d4af6a;--ink:#1b2a1c;--bg:#0e1a2b;--card:#fdfbf6}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Segoe UI',Arial,Helvetica,sans-serif;background:var(--bg);color:#e8e6df}
+.banner{background:#dc2626;color:#fff;text-align:center;padding:10px;font-weight:700;font-size:.9rem}
+header{background:linear-gradient(135deg,var(--grad1),var(--grad2));color:#fff;padding:16px 5%;display:flex;justify-content:space-between;align-items:center}
+.logo{font-weight:800;font-size:1.3rem;display:flex;gap:8px;align-items:center}
+.logo span{color:var(--accent)}
+.logo{font-family:Georgia,'Times New Roman',serif;letter-spacing:.5px}
+.fakebar{background:#050a12;color:#94a3b8;font-size:.8rem;padding:6px 5%;display:flex;align-items:center;gap:8px;border-bottom:1px solid #1c3352}
+.fakebar .padlock{color:#dc2626;font-size:.9rem}
+.fakebar .url{font-family:monospace}
+.home-hero{background:linear-gradient(135deg,var(--grad1),var(--grad2));color:#fff;text-align:center;padding:60px 5%}
+.home-hero h1{font-size:1.6rem;margin:0 0 10px}
+.home-hero p{max-width:40ch;margin:0 auto 24px;font-size:.95rem;opacity:.95}
+.home-btn{background:var(--accent);color:#1b1200;border:none;padding:12px 30px;border-radius:30px;font-weight:800;cursor:pointer;font-size:1rem}
+.home-alert-box{max-width:520px;margin:30px auto;background:#fff7ed;border:1.5px solid #f59e0b;border-radius:12px;padding:16px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;box-shadow:0 4px 14px rgba(245,158,11,.15);animation:alertpulse 1.6s infinite}
+@keyframes alertpulse{0%,100%{box-shadow:0 4px 14px rgba(245,158,11,.15)}50%{box-shadow:0 4px 22px rgba(245,158,11,.4)}}
+.home-alert-box .alert-triangle{font-size:1.8rem;flex-shrink:0}
+.home-alert-box strong{color:#92400e;font-size:.95rem}
+.home-alert-box p{margin:4px 0 0;font-size:.85rem;color:#78350f}
+.home-alert-box .alert-arrow{font-size:1.6rem;color:#f59e0b;margin-left:auto}
+#homePage{display:block}
+#loginPage{display:none}
+.navlinks{display:flex;gap:18px;font-size:.85rem;opacity:.95}
+.navlinks span{cursor:default}
+.navlinks .nav-action{cursor:pointer;font-weight:700;text-decoration:underline;text-underline-offset:3px;position:relative}
+.navlinks .nav-action::after,.mobile-only::after{content:'';position:absolute;top:-6px;right:-10px;width:8px;height:8px;border-radius:50%;background:#ff3b3b;animation:blinkdot .8s infinite}
+@media (max-width:640px){
+  .navlinks{display:none}
+  .mobile-only{display:inline-block!important;color:#fff;font-size:.85rem}
+}
+main{max-width:420px;margin:40px auto;background:var(--card);border-radius:14px;padding:30px;box-shadow:0 8px 24px rgba(15,23,42,.12)}
+.alert{background:#fff1e6;border:1px solid #f59e0b;border-radius:8px;padding:12px;font-size:.9rem;margin-bottom:20px;color:#92400e}
+h1{font-size:1.3rem;margin:0 0 8px}
+p.lead{color:#64748b;font-size:.9rem;margin:0 0 20px}
+label{display:block;font-size:.85rem;margin:14px 0 4px;color:#334155}
+.field{position:relative}
+input{width:100%;padding:10px 40px 10px 12px;border:1px solid #cbd5e1;border-radius:8px;font-size:1rem}
+input:focus{outline:none;border-color:var(--grad2);box-shadow:0 0 0 3px rgba(8,145,178,.15)}
+.toggle-pass{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.1rem;color:#64748b;padding:2px}
+.btn{width:100%;margin-top:22px;background:linear-gradient(135deg,var(--accent),#b8935a);color:#1b1200;border:none;padding:13px;border-radius:8px;font-size:1rem;font-weight:800;cursor:pointer}
+.result{display:none;margin-top:20px;padding:16px;border-radius:10px;background:#ecfeff;border:1px solid var(--grad2);font-size:.9rem;line-height:1.5}
+.result h2{margin:0 0 8px;font-size:1rem;color:var(--grad1)}
+.result ul{margin:8px 0 0;padding-left:18px}
+footer{text-align:center;font-size:.75rem;color:#94a3b8;padding:20px}
+.watermark{position:relative;text-align:center;font-size:.75rem;color:#c9d2c3;letter-spacing:1px;margin-top:10px;user-select:none}
+
+.fakeurl{background:#dfe3e8;padding:8px 5%;display:flex;align-items:center;gap:8px;font-size:.8rem;color:#333;font-family:'Courier New',monospace;border-bottom:1px solid #c4c9cf}
+.fakeurl .padlock{color:#dc2626;font-size:1rem}
+.fakeurl .barurl{background:#fff;border-radius:14px;padding:5px 12px;flex:1;max-width:420px;color:#555;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.home-hero{background:linear-gradient(135deg,var(--grad1),var(--grad2));color:#fff;text-align:center;padding:60px 6%}
+.home-hero h1{color:#fff;font-size:1.8rem;margin:0 0 10px}
+.home-hero p{max-width:44ch;margin:0 auto 26px;opacity:.95}
+.home-btn{background:#fff;color:var(--grad1);border:none;padding:13px 30px;border-radius:8px;font-weight:800;cursor:pointer;font-size:1rem}
+.home-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;max-width:760px;margin:34px auto;padding:0 6%}
+.home-card{background:var(--card);border-radius:10px;padding:18px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.06);font-size:.85rem}
+.home-card .ic{font-size:1.6rem;margin-bottom:6px}
+#loginPage{display:none}
+
+@keyframes glitch{
+  0%,100%{transform:translate(0,0)}
+  20%{transform:translate(-4px,3px)}
+  40%{transform:translate(4px,-3px)}
+  60%{transform:translate(-3px,-2px)}
+  80%{transform:translate(3px,2px)}
+}
+body.glitching{animation:glitch .12s linear 6}
+
+.hack-overlay{
+  display:none;position:fixed;inset:0;background:#000;color:#22ff55;
+  font-family:'Courier New',monospace;z-index:999;
+  align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:24px
+}
+.hack-overlay.show{display:flex}
+.hack-overlay h1{font-size:2rem;color:#ff3b3b;margin:0 0 6px;letter-spacing:1px;animation:pulse .5s infinite;text-shadow:0 0 12px #ff3b3b}
+@keyframes pulse{50%{opacity:.35}}
+.hack-overlay{background:radial-gradient(circle at center,#1a0000,#000 70%);border:0 solid #ff3b3b;animation:borderpulse 1s infinite}
+@keyframes borderpulse{0%,100%{box-shadow:inset 0 0 0px #ff3b3b}50%{box-shadow:inset 0 0 60px #ff3b3b}}
+.rec-indicator{position:absolute;top:16px;left:16px;display:flex;align-items:center;gap:6px;color:#ff3b3b;font-size:.75rem;font-weight:700}
+.rec-dot{width:9px;height:9px;border-radius:50%;background:#ff3b3b;animation:blinkdot .8s infinite}
+@keyframes blinkdot{50%{opacity:.2}}
+.scanline{position:absolute;left:0;right:0;height:2px;background:rgba(255,59,59,.5);animation:scan 2.2s linear infinite}
+@keyframes scan{0%{top:0}100%{top:100%}}
+.skull{font-size:2.4rem;margin-bottom:4px;animation:pulse .5s infinite}
+.hack-overlay .countdown{font-size:3rem;color:#ff3b3b;font-weight:800;margin:8px 0}
+.hack-overlay p{font-size:.95rem;color:#ff5c5c;max-width:340px;margin:4px 0;white-space:pre-line;text-align:left;font-weight:700}
+.hack-overlay .loc{color:#facc15;font-size:.85rem;margin-top:6px}
+.hack-btn{margin-top:22px;background:#22ff55;color:#000;border:none;padding:10px 26px;border-radius:6px;font-weight:800;cursor:pointer;font-family:inherit;display:none}
+.progress-wrap{width:280px;height:14px;background:#111;border:1px solid #22ff55;border-radius:7px;overflow:hidden;margin-top:14px}
+.progress-bar{height:100%;width:0%;background:#ff3b3b;transition:width .6s linear}
+.progress-label{font-size:.8rem;color:#ff3b3b;margin-top:4px;font-weight:700}
+</style>
+</head>
+<body>
+<div class="banner">⚠️ SIMULACIÓN EDUCATIVA — AgroBanco NO EXISTE. Ningún dato se envía ni se guarda.</div>
+
+<div class="fakebar">
+  <span class="padlock">🔓</span>
+  <span class="url">http://agrobanco-online-seguro.com/acceso</span>
+</div>
+
+<header>
+  <div class="logo">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="12" cy="6" r="3.4" fill="#d4af6a"/>
+      <circle cx="17" cy="10" r="3.4" fill="#d4af6a"/>
+      <circle cx="15" cy="16" r="3.4" fill="#d4af6a"/>
+      <circle cx="9" cy="16" r="3.4" fill="#d4af6a"/>
+      <circle cx="7" cy="10" r="3.4" fill="#d4af6a"/>
+      <circle cx="12" cy="12" r="2.6" fill="#fffbe8"/>
+    </svg>
+    Agro<span>Banco</span>
+  </div>
+  <nav class="navlinks">
+    <span>Inicio</span><span>Cuentas</span><span>Tarjetas</span><span>Préstamos</span>
+    <span class="nav-action" onclick="goToLogin()">Actualizar cuenta</span>
+  </nav>
+  <span class="nav-action mobile-only" onclick="goToLogin()" style="display:none">Actualizar cuenta</span>
+</header>
+
+<div id="homePage">
+  <div class="home-hero">
+    <h1>Bienvenido a AgroBanco en línea</h1>
+    <p>Gestiona tus cuentas, tarjetas y préstamos desde un solo lugar, de forma simple y segura.</p>
+    <button class="home-btn" onclick="goToLogin()">Iniciar sesión</button>
+  </div>
+  <div class="home-alert-box" onclick="goToLogin()">
+    <span class="alert-triangle">⚠️</span>
+    <div>
+      <strong>Notificación de seguridad</strong>
+      <p>Detectamos actividad inusual en tu cuenta. Restablece tu contraseña ahora.</p>
+    </div>
+    <span class="alert-arrow">›</span>
+  </div>
+</div>
+
+<main id="loginPage">
+  <div class="alert">
+    <strong>⚠️ Tu clave está por expirar.</strong><br>
+    Actualízala antes de que el tiempo se agote o perderás el acceso a tu cuenta en línea.
+    <div id="urgencyTimer" style="margin-top:8px;font-size:1.3rem;font-weight:800;color:#b3261e">05:00</div>
+  </div>
+
+  <h1>Actualizar clave de acceso</h1>
+  <p class="lead">Ingresa tus datos para mantener tu cuenta activa.</p>
+
+  <form id="phishForm">
+    <label for="usuario">Número de cuenta o usuario</label>
+    <input id="usuario" type="text" placeholder="Ej. 0123456789" required>
+
+    <label for="clave">Clave actual</label>
+    <div class="field">
+      <input id="clave" type="password" placeholder="••••••••" required>
+      <button type="button" class="toggle-pass" onclick="togglePass('clave',this)">👁️</button>
+    </div>
+
+    <label for="nueva">Nueva clave</label>
+    <div class="field">
+      <input id="nueva" type="password" placeholder="••••••••" required>
+      <button type="button" class="toggle-pass" onclick="togglePass('nueva',this)">👁️</button>
+    </div>
+
+    <button class="btn" type="submit">Actualizar clave</button>
+  </form>
+
+  <div class="result" id="result">
+    <h2>🎓 Esto era una simulación de phishing</h2>
+    Si hubieras enviado esto en un sitio real, acabarías de entregar tu usuario y clave bancaria a un estafador. Señales que debiste notar:
+    <ul>
+      <li>"AgroBanco" es un banco inventado, no existe de verdad.</li>
+      <li>Genera <strong>urgencia falsa</strong> ("30 minutos o pierdes acceso").</li>
+      <li>Pide tu <strong>clave actual</strong>, algo que ningún banco real solicita por este medio.</li>
+      <li>Suele llegar por un enlace de correo, SMS o WhatsApp, no entrando tú directo a la app o web oficial.</li>
+      <li>No hay forma de verificar que el dominio sea el oficial del banco.</li>
+    </ul>
+  </div>
+
+  <div class="watermark">Jacky-Keyly_INFO</div>
+</main>
+
+<div class="hack-overlay" id="hackOverlay">
+  <div class="scanline"></div>
+  <div class="rec-indicator"><span class="rec-dot"></span> REC</div>
+  <div class="skull">💀</div>
+  <h1>⚠ PROCESANDO SOLICITUD ⚠</h1>
+  <div class="countdown" id="countdown">10</div>
+  <p id="hackText"></p>
+  <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+  <div class="progress-label" id="progressLabel">0% procesado</div>
+  <div class="loc" id="hackLoc"></div>
+  <div class="loc" id="hackPhone"></div>
+  <button class="hack-btn" id="hackBtn" onclick="closeHack()">Entendido</button>
+</div>
+
+<footer>Material didáctico creado para una clase sobre seguridad informática. AgroBanco es un nombre ficticio, no representa ninguna entidad real.</footer>
+
+<script>
+function togglePass(id,btn){
+  const i=document.getElementById(id);
+  const show = i.type==='password';
+  i.type = show ? 'text' : 'password';
+  btn.textContent = show ? '🙈' : '👁️';
+}
+function goToLogin(){
+  document.getElementById('homePage').style.display='none';
+  document.getElementById('loginPage').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+  startUrgencyTimer();
+}
+function beep(freq,dur,delay){
+  try{
+    const ctx = window.__actx || (window.__actx = new (window.AudioContext||window.webkitAudioContext)());
+    const o=ctx.createOscillator(), g=ctx.createGain();
+    o.type='square'; o.frequency.value=freq;
+    o.connect(g); g.connect(ctx.destination);
+    g.gain.setValueAtTime(0.001,ctx.currentTime+delay/1000);
+    g.gain.exponentialRampToValueAtTime(0.15,ctx.currentTime+delay/1000+0.02);
+    g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+delay/1000+dur/1000);
+    o.start(ctx.currentTime+delay/1000);
+    o.stop(ctx.currentTime+delay/1000+dur/1000+0.05);
+  }catch(e){}
+}
+let urgencySeconds = 300;
+let urgencyInterval = null;
+const urgencyEl = document.getElementById('urgencyTimer');
+function startUrgencyTimer(){
+  clearInterval(urgencyInterval);
+  urgencySeconds=300; urgencyEl.textContent='05:00';
+  urgencyEl.style.color='#b3261e'; urgencyEl.style.animation='none';
+  urgencyInterval = setInterval(()=>{
+    if(urgencySeconds<=0){ clearInterval(urgencyInterval); return; }
+    urgencySeconds--;
+    const m=String(Math.floor(urgencySeconds/60)).padStart(2,'0');
+    const s=String(urgencySeconds%60).padStart(2,'0');
+    urgencyEl.textContent = m+':'+s;
+    if(urgencySeconds<=60){ urgencyEl.style.color='#ff0000'; urgencyEl.style.animation='pulse .6s infinite'; }
+  },1000);
+}
+
+function closeHack(){
+  clearInterval(urgencyInterval);
+  urgencySeconds=300;
+  urgencyEl.textContent='05:00';
+  urgencyEl.style.animation='none';
+  urgencyEl.style.color='#b3261e';
+  document.getElementById('hackOverlay').classList.remove('show');
+  document.getElementById('phishForm').reset();
+  document.getElementById('phishForm').style.display='block';
+  document.getElementById('loginPage').style.display='none';
+  document.getElementById('homePage').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+document.getElementById('phishForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  const form=this;
+  document.body.classList.add('glitching');
+  if(navigator.vibrate) navigator.vibrate([120,60,120,60,200]);
+  beep(880,150,0); beep(660,150,150); beep(440,300,300);
+
+  const overlay=document.getElementById('hackOverlay');
+  const txt=document.getElementById('hackText');
+  const loc=document.getElementById('hackLoc');
+  const cd=document.getElementById('countdown');
+  const btn=document.getElementById('hackBtn');
+  loc.textContent=''; txt.textContent=''; btn.style.display='none';
+  document.getElementById('hackPhone').textContent='';
+  const pbar=document.getElementById('progressBar'), plabel=document.getElementById('progressLabel');
+  pbar.style.width='0%'; plabel.textContent='0% procesado';
+
+  const lines=[
+    'Procesando datos ingresados...',
+    'Datos registrados correctamente.',
+    'Conectando con servidor de destino...',
+    'Consultando lista de contactos...',
+    'Consultando galería de imágenes...',
+    'Enviando notificación a contactos...',
+    'Cerrando sesión en otros 3 dispositivos...',
+    'Consultando historial de cuenta...',
+    'Enviando registro a servidor remoto...'
+  ];
+
+  setTimeout(()=>{
+    document.body.classList.remove('glitching');
+    overlay.classList.add('show');
+    let count=5;
+    cd.textContent=count;
+    const timer=setInterval(()=>{
+      count--; cd.textContent = count>0?count:'0';
+      if(count<=0) clearInterval(timer);
+    },1000);
+
+    let i=0, shown='';
+    const typer=setInterval(()=>{
+      if(i<lines.length){
+        const line = lines[i];
+        const base = shown;
+        const chars='!<>-_\\/[]{}—=+*^?#01';
+        let frame=0;
+        const scramble=setInterval(()=>{
+          let s='';
+          for(let c=0;c<line.length;c++){
+            s += Math.random()<0.5+frame*0.15 ? line[c] : chars[Math.floor(Math.random()*chars.length)];
+          }
+          txt.textContent = base + (base?'\\n':'') + '> ' + s;
+          frame++;
+          if(frame>3){ clearInterval(scramble); shown = base + (base?'\\n':'') + '> ' + line; txt.textContent = shown; }
+        },40);
+        beep(300,80,0);
+        i++;
+        const pct = Math.round((i/lines.length)*100);
+        pbar.style.width = pct+'%';
+        plabel.textContent = pct+'% procesado';
+      } else {
+        clearInterval(typer);
+        loc.textContent='📍 Ubicación detectada: El Salvador — Cuscatlán Sur';
+        setTimeout(()=>{
+          document.getElementById('hackPhone').textContent='📞 Número asociado: +503 7123-4567';
+        },600);
+        setTimeout(()=>{
+          txt.textContent += '\\n\\n>>> PROCESO FINALIZADO AL 100% <<<';
+          beep(150,500,0);
+        },1300);
+        setTimeout(()=>{ btn.style.display='inline-block'; },2600);
+      }
+    },700);
+  },400);
+});
+</script>
+</body>
+</html>
